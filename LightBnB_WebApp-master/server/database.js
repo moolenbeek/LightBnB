@@ -148,125 +148,32 @@ exports.getAllProperties = getAllProperties;
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function(property) {
-  // 1
-  const queryParams = [];
-  const values = [];
 
-  // 2
-  let queryString = `
-  INSERT INTO properties(
+ const addProperty = function(property) {
+  const queryString = `
+  INSERT INTO properties
+  (owner_id, title, description, thumbnail_photo_url, cover_photo_url, cost_per_night, street, city, province, post_code, country, parking_spaces, number_of_bathrooms, number_of_bedrooms) 
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+  RETURNING *;
   `;
 
-  // 3
-  if (property.owner_id) {
-    queryParams.push(property.owner_id)
-    values.push(`$${queryParams.length}`)
-    queryString += 'owner_id, ';
-  }
-
-  if (property.title) {
-    queryParams.push(property.title)
-    values.push(`$${queryParams.length}`)
-    queryString += 'title, ';
-  }
-
-  if (property.description) {
-    queryParams.push(property.description)
-    values.push(`$${queryParams.length}`)
-    queryString += 'description, ';
-  }
-
-  if (property.thumbnail_photo_url) {
-    queryParams.push(property.thumbnail_photo_url)
-    values.push(`$${queryParams.length}`)
-    queryString += 'thumbnail_photo_url, ';
-  }
-
-  if (property.cover_photo_url) {
-    queryParams.push(property.cover_photo_url)
-    values.push(`$${queryParams.length}`)
-    queryString += 'cover_photo_url, ';
-  }
-
-  if (property.cost_per_night) {
-    queryParams.push(property.cost_per_night)
-    values.push(`$${queryParams.length}`)
-    queryString += 'cost_per_night, ';
-  }
-
-  if (property.street) {
-    queryParams.push(property.street)
-    values.push(`$${queryParams.length}`)
-    queryString += 'street, ';
-  }
-
-  if (property.city) {
-    queryParams.push(property.city)
-    values.push(`$${queryParams.length}`)
-    queryString += 'city, ';
-  }
-
-  if (property.province) {
-    queryParams.push(property.province)
-    values.push(`$${queryParams.length}`)
-    queryString += 'province, ';
-  }
-
-  if (property.post_code) {
-    queryParams.push(property.post_code)
-    values.push(`$${queryParams.length}`)
-    queryString += 'post_code, ';
-  }
-
-  if (property.country) {
-    queryParams.push(property.country)
-    values.push(`$${queryParams.length}`)
-    queryString += 'country, ';
-  }
-
-  if (property.parking_spaces) {
-    queryParams.push(property.parking_spaces)
-    values.push(`$${queryParams.length}`)
-    queryString += 'parking_spaces, ';
-  }
-
-  if (property.number_of_bathrooms) {
-    queryParams.push(property.number_of_bathrooms)
-    values.push(`$${queryParams.length}`)
-    queryString += 'number_of_bathrooms, ';
-  }
-
-  if (property.number_of_bedrooms) {
-    queryParams.push(property.number_of_bedrooms)
-    values.push(`$${queryParams.length}`)
-    queryString += 'number_of_bedrooms, ';
-  }
-
-  // remove trailing space and comma
-  queryString = queryString.slice(0, -2);
-
-  // add values to queryString
-  queryString +=
-  `) 
-  VALUES (
-  `;
-
-  for (let i = 0; i < values.length; i++) {
-    queryString += values[i] + ', '
-  }
-
-  // remove trailing space and comma
-  queryString = queryString.slice(0, -2);
-
-  queryString += 
-  `)
-  RETURNING *;`;
-
-  // 5
-  return pool.query(queryString, queryParams)
-  .then(
-    data => data.rows[0]
-  )
+  return pool.query(queryString, [
+    property.owner_id,
+    property.title,
+    property.description,
+    property.thumbnail_photo_url,
+    property.cover_photo_url,
+    property.cost_per_night,
+    property.street,
+    property.city,
+    property.province,
+    property.post_code,
+    property.country,
+    property.parking_spaces,
+    property.number_of_bathrooms,
+    property.number_of_bedrooms
+  ])
+  .then((data) => {data.rows[0]})
+  .catch((error) => error);
 }
 exports.addProperty = addProperty;
